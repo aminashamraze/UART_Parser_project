@@ -61,13 +61,7 @@ typedef struct
 } UART_Message;
 
 
-/* =========================================================
- * Parser state management
- * ========================================================= */
-
-/*
- * Private helper: only this .c file should reset parser internals.
- */
+* Parser state management*/
 static void UART_ParserReset(UART_Parser *parser)
 {
     if (parser == NULL)
