@@ -84,9 +84,8 @@ void UART_ParserInit(UART_Parser *parser)
 }
 
 
-/* =========================================================
- * Individual-byte validation
- * ========================================================= */
+/* 
+ * Individual-byte validation */
 
 static bool UART_IsAllowedByte(char c)
 {
@@ -133,7 +132,7 @@ static bool UART_IsValidFrame(const char *frame)
     }
 
     /*
-     * Begin checking after the first '@'.
+     * checking after the first '@'.
      */
     index = 1U;
 
@@ -164,7 +163,7 @@ static bool UART_IsValidFrame(const char *frame)
         return false;
     }
 
-    /* Reject an empty command: @=15
+    /* Rejecting an empty command: @=15
      */
     if (equals_index == 1U)
     {
@@ -172,7 +171,7 @@ static bool UART_IsValidFrame(const char *frame)
     }
 
     /*
-     * Reject an empty value:
+     * Rejecting an empty value:
      *
      * @PWM=
      */
@@ -202,7 +201,7 @@ static bool UART_TokenizeFrame(
     }
 
     /*
-     * Copy command characters until '='.
+     * Copying command characters until '='.
      */
     while (frame[frame_index] != '=')
     {
@@ -216,7 +215,7 @@ static bool UART_TokenizeFrame(
         }
 
         /*
-         * Leave one byte available for '\0'.
+         * Leaving one byte available for '\0'.
          */
         if (command_index >= UART_COMMAND_MAX - 1U)
         {
@@ -238,7 +237,7 @@ static bool UART_TokenizeFrame(
     frame_index++;
 
     /*
-     * Copy value characters until the end of the frame.
+     * Copying value characters until the end of the frame.
      */
     while (frame[frame_index] != '\0')
     {
@@ -251,7 +250,7 @@ static bool UART_TokenizeFrame(
         }
 
         /*
-         * Leave one byte available for '\0'.
+         * Leaving one byte available for '\0'.
          */
         if (value_index >= UART_VALUE_MAX - 1U)
         {
@@ -304,9 +303,8 @@ static ParserStatus UART_ParseFrame(
 }
 
 
-/* =========================================================
- * Byte-by-byte frame collection
- * ========================================================= */
+/* ===========
+ * Byte-by-byte frame collection */
 
 ParserStatus UART_ParserPushByte(
     UART_Parser *parser,
@@ -354,7 +352,7 @@ ParserStatus UART_ParserPushByte(
         }
 
         /*
-         * Turn the collected bytes into a C string.
+         * Turning the collected bytes into a C string.
          */
         parser->frame[parser->length] = '\0';
 
@@ -363,7 +361,7 @@ ParserStatus UART_ParserPushByte(
             tokens_out);
 
         /*
-         * Prepare for the next frame.
+         * Preparation for the next frame.
          */
         UART_ParserReset(parser);
 
@@ -371,7 +369,7 @@ ParserStatus UART_ParserPushByte(
     }
 
     /*
-     * Reject unsupported characters.
+     * Rejecting unsupported characters.
      */
     if (!UART_IsAllowedByte(c))
     {
@@ -396,7 +394,7 @@ ParserStatus UART_ParserPushByte(
     }
 
     /*
-     * Store the byte and move to the next position.
+     * Storing the byte and move to the next position.
      */
     parser->frame[parser->length] = c;
     parser->length++;
@@ -472,7 +470,9 @@ static bool UART_ParseUint32(
         digit = (uint32_t)(*value_string - '0');
 
         /*
-         * Check whether:
+
+        adopted in v02
+         * Checking whether:
          *
          * value * 10 + digit
          *
@@ -493,12 +493,11 @@ static bool UART_ParseUint32(
 }
 
 
-/* =========================================================
+/* 
  * Interpret tokens
  *
  * command string → enum
- * value string   → integer
- * ========================================================= */
+ * value string   → integer */
 
 static ParserStatus UART_InterpretTokens(
     const UART_Tokens *tokens,
@@ -596,9 +595,9 @@ static bool UART_HandleRate(uint32_t value)
 }
 
 
-/* =========================================================
+/* =========================
  * Command dispatch
- * ========================================================= */
+ *============================= */
 
 bool UART_Dispatch(const UART_Message *message)
 {
@@ -638,7 +637,7 @@ void UART_ProcessReceivedByte(
     ParserStatus status;
 
     /*
-     * First collect, validate, and tokenize the frame.
+     * First collecting, then validation, and tokenize the frame.
      */
     status = UART_ParserPushByte(
         parser,
@@ -655,7 +654,7 @@ void UART_ProcessReceivedByte(
     }
 
     /*
-     * Next convert strings into typed values.
+     * Next converting strings into typed values.
      */
     status = UART_InterpretTokens(
         &tokens,
@@ -670,7 +669,7 @@ void UART_ProcessReceivedByte(
     }
 
     /*
-     * Finally execute the command.
+     * Finally executing the command.
      */
     (void)UART_Dispatch(&message);
 }
